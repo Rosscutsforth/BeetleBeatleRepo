@@ -45,7 +45,7 @@ public class PlayerScript : MonoBehaviour
     private Camera mainCamera;
     private float originalCameraSize;
     public float newCameraSize;
-    public float cameraTransitionDuration = 2.5f;
+    public float cameraTransitionDuration = 30f;
     private float currentTime = 0f;
     private float groundedTimer;
 
@@ -263,37 +263,38 @@ public class PlayerScript : MonoBehaviour
 
     public void skyCamera()
     {
-        if(isGrounded == false)
+        if (isGrounded == false)
         {
             groundedTimer += Time.deltaTime;
-        }else
+        }
+        else
         {
             groundedTimer = 0f;
         }
 
-        currentTime += Time.deltaTime;
-        float t = Mathf.Clamp01(currentTime / cameraTransitionDuration);
+        currentTime = 0.1f;
 
-        if(groundedTimer > 1.5f)
+        if (groundedTimer > 1.25f)
         {
-            print("I'm working");
+            if (currentTime <= cameraTransitionDuration)
+            {
+                currentTime += Time.deltaTime;
+                float t = currentTime / cameraTransitionDuration;
 
-            float interpolatedSize = Mathf.Lerp(mainCamera.orthographicSize, newCameraSize, t);
-
-            /*Rect interpolatedRect = new Rect(
-                Mathf.Lerp(originalCameraRect.x, newCameraRect.x, t),
-                Mathf.Lerp(originalCameraRect.y, newCameraRect.y, t),
-                Mathf.Lerp(originalCameraRect.width, newCameraRect.width, t),
-                Mathf.Lerp(originalCameraRect.height, newCameraRect.height, t)
-            );*/
-
-            mainCamera.orthographicSize = interpolatedSize;
-        }else
+                float interpolatedSize = Mathf.Lerp(mainCamera.orthographicSize, newCameraSize, t);
+                mainCamera.orthographicSize = interpolatedSize;
+            }
+        }
+        else
         {
+            if (currentTime > 0f)
+            {
+                currentTime -= Time.deltaTime;
+                float t = currentTime / (cameraTransitionDuration / 4);
 
-            float reverseInterpolatedSize = Mathf.Lerp(mainCamera.orthographicSize, originalCameraSize, t);
-
-            mainCamera.orthographicSize = reverseInterpolatedSize;
+                float reverseInterpolatedSize = Mathf.Lerp(mainCamera.orthographicSize, originalCameraSize, t);
+                mainCamera.orthographicSize = reverseInterpolatedSize;
+            }
         }
     }
 
